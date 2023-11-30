@@ -52,7 +52,7 @@ def main():
     sub_centre = rospy.Subscriber('centre', Point, centreCallback)
     sub_corner0 = rospy.Subscriber('corner0', Point, corner0Callback)
     sub_forward = rospy.Subscriber('forward', Point, forwardCallback)
-    pub_pose = rospy.Publisher('brick_pose', Pose, queue_size=10)
+    pub_pose = rospy.Publisher('object_pose', Pose, queue_size=10)
     brick_pose = Pose()
 
     # initialize robot
