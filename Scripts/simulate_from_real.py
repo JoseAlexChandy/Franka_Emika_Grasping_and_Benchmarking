@@ -6,6 +6,8 @@ from grasp_benchmark.utils.ros_utils import *
 from alr_sim.sims.SimFactory import SimRepository
 from utils.ycb_utils import YCBLoader
 
+#For other object or if for example: "Banana" Run it using the command  python your_script_name.py 011_banana
+
 # Set the object ID here or pass it as a command line argument
 model_dir = "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/"
 object_id = "006_mustard_bottle"  # default object
