@@ -6,13 +6,15 @@ from grasp_benchmark.utils.ros_utils import *
 from alr_sim.sims.SimFactory import SimRepository
 from utils.ycb_utils import YCBLoader
 
-#For other object or if for example: "Banana" Run it using the command  python your_script_name.py 011_banana
+#For other object or if for example: "Banana" Run it using the command  python your_script_name.py "011_banana" "model_dir"
 
 # Set the object ID here or pass it as a command line argument
-model_dir = "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/"
+model_dir = "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/" # You can chane the model directory here or give it as a parameter when you run the script.
 object_id = "006_mustard_bottle"  # default object
+
 if len(sys.argv) > 1:
     object_id = sys.argv[1]
+    model_dir = sys.argv[2]
 
 NUMBER_OF_CANDIDATES = 1
 global_scene = None

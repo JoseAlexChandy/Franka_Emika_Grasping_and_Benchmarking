@@ -18,11 +18,16 @@ from geometry_msgs.msg import Pose, TransformStamped, Point
 from sensor_msgs.msg import CameraInfo, Image, PointCloud2
 from std_msgs.msg import Header
 
+
+
+# Run it using the command  python with_aruco.py "distance in centimeter"
 NUMBER_OF_CANDIDATES = 1
 
 global_scene = None
-
-
+distance = 10 # Refer the Aruco to origin of the object distance from the object table or look at the aruco marker template you are using.
+if len(sys.argv) > 1:
+    distance = sys.argv[1] 
+    
 centreC = np.array([0.0, 0.0, 0.0])
 corner0 = np.array([0.0, 0.0, 0.0])
 forwardO = np.array([0.0, 0.0, 0.0])
@@ -84,7 +89,7 @@ def main():
     #                 [0.707106781, 0.707106781, 0],
     #                 [0, 0, 1]])
 
-    rBA_A = np.array([0,-0.10, 0.0])
+    rBA_A = np.array([0,-1.0*(float(distance)/100), 0.0])
     RAB = np.eye(3)
     
     
@@ -163,3 +168,40 @@ if __name__ == "__main__":
 
 
 
+# CAMERA on BOB-Control: 
+#   roslaunch realsense2_camera rs_rgbd.launch enable_pointcloud:=true tf_prefix:=measured/camera
+#   
+# GRASP SERVICE in vincent-gpu:
+#   ssh -Y pablolopezcustodio@10.0.2.10
+#   cd grasping-benchmarks-panda/docker
+#   bash run.sh heap dexnet_container heap/benchmark_dexnet 
+#   or:  bash run.sh heap dexnet_container
+#   source /workspace/catkin_ws/devel/setup.bash
+#   export ROS_MASTER_URI=http://10.0.2.3:11311
+#   export ROS_IP=10.0.2.10
+#   roslaunch grasping_benchmarks_ros grasp_planning_benchmark.launch
+#
+# DETECT ARUCO MARKER in Bob-control:
+#   conda activate grasp_benchmark
+#   source ~/GraspBenchmarkWorkspace/devel/setup.bash
+#   rosrun marker_detect DetectBox_.py
+#
+# DEPROJECTION in bob-control:
+#   source ~/GraspBenchmarkWorkspace/devel/setup.bash
+#   rosrun marker_detect Pix2Depth.py
+#
+# SIMULATION
+#   conda activate grasp_benchmark
+#   source ~/GraspBenchmarkWorkspace/devel/setup.bash
+#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/simulate_from_real.py
+#
+# SL
+#   cd ~/sl_ws/sl/build/sl_panda
+#   Activate FCI in the franka emika interface
+#   ./xrpanda
+#
+# SCRIPT
+#   conda activate grasp_benchmark
+#   source ~/GraspBenchmarkWorkspace/devel/setup.bash
+#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/with_aruco.py
+#
