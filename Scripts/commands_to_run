@@ -50,7 +50,7 @@
 
 #   source ~/GraspBenchmarkWorkspace/devel/setup.bash
 
-#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/simulate_from_real.py
+#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/simulate_from_real.py "011_banana" "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/"
 
 #
 
@@ -69,7 +69,7 @@
 
 #   source ~/GraspBenchmarkWorkspace/devel/setup.bash
 
-#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/with_aruco.py
+#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/with_aruco.py 17.53
 
 
  
