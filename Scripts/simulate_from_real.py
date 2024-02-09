@@ -5,37 +5,65 @@ from geometry_msgs.msg import Pose
 from grasp_benchmark.utils.ros_utils import *
 from alr_sim.sims.SimFactory import SimRepository
 from utils.ycb_utils import YCBLoader
+import pywavefront
 
 #For other object or if for example: "Banana" Run it using the command  python your_script_name.py "011_banana" "model_dir"
 
 # Set the object ID here or pass it as a command line argument
-model_dir = "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/" # You can chane the model directory here or give it as a parameter when you run the script.
+base_dir = "/home/heap/GraspBenchmarkWorkspace/YCB/models/ycb/" # You can chane the model directory here or give it as a parameter when you run the script.
 object_id = "006_mustard_bottle"  # default object
 
 if len(sys.argv) > 1:
     object_id = sys.argv[1]
-    model_dir = sys.argv[2]
+    base_dir = sys.argv[2]
 
 NUMBER_OF_CANDIDATES = 1
 global_scene = None
 
+def calculate_dimensions(vertices):
+    x_min, x_max = np.min(vertices[:, 0]), np.max(vertices[:, 0])
+    y_min, y_max = np.min(vertices[:, 1]), np.max(vertices[:, 1])
+    z_min, z_max = np.min(vertices[:, 2]), np.max(vertices[:, 2])
+    return x_max,x_min, y_max,y_min, z_max,z_min
+
+def load_mesh_model(file_path):
+    scene = pywavefront.Wavefront(file_path)
+    items = list(scene.materials.items())
+    ver = items[0][1].vertices
+    n_ver = int(len(ver)/8)
+    v = np.zeros((n_ver,3))
+    for i in range(n_ver):
+        v[i,:] = ver[8*i+5:8*i+5+3]
+    return v
+    
 def main():
     # ROS Init
     rospy.init_node("test")
     pub_grasp_pose = rospy.Publisher('grasp_pose', Pose, queue_size=10)
     grasp_pose = Pose()
 
-    factory_string = "mj_beta"
-    YCB_loader = YCBLoader(ycb_base_folder = model_dir, factory_string=factory_string)
+    factory_string = "pybullet"
+    YCB_loader = YCBLoader(ycb_base_folder = base_dir, factory_string=factory_string)
+    # List all directories in the base path
+    model_dirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
+    # Construct the file path for each model
+    for model_dir in model_dirs:
+        if model_dir == object_id:
+            #input("Success")
+            file_path = os.path.join(base_dir, model_dir, 'google_16k', 'textured.obj')
+            #OUTPUT_PATH = f'{out_path}{os.path.basename(os.path.dirname(os.path.dirname(file_path)))}.png'
+            if os.path.isfile(file_path):
+                vertices = load_mesh_model(file_path)
+                x_max,x_min, y_max,y_min, z_max,z_min = calculate_dimensions(vertices)
     
     print('waiting for pose of the object')
     pose_msg = rospy.wait_for_message('object_pose', Pose)
-    print(pose_msg)
     q_WB = [pose_msg.orientation.w, 
             pose_msg.orientation.x, 
             pose_msg.orientation.y,
             pose_msg.orientation.z]
-    rBW_W = [pose_msg.position.x, pose_msg.position.y, -0.017]
+    rBW_W = [pose_msg.position.x, pose_msg.position.y, z_min]
+    print("pose_msg:",pose_msg.position.z)
     print('received position:', rBW_W)
     print('received orientation:', q_WB)
     loaded_object, object_name = YCB_loader.get_ycb_object(obj_id=object_id, pos=rBW_W, quat=q_WB)
@@ -50,7 +78,10 @@ def main():
 
     agent.inhand_cam.set_cam_params(width=640, height=480)
 
+    
+
     scene.start()
+    
 
     print(f'{object_name} position')
     print(scene.get_obj_pos(obj_name = object_name))
@@ -61,6 +92,7 @@ def main():
     print(scene.get_obj_seg_id(obj_name=object_name))
     # Wait time configuration
     wait_time = 0.5
+    
 
     # Go to home position
     home_pos = [0.35, 0.0, 0.60]
@@ -76,8 +108,9 @@ def main():
     print(f'Final position of {object_name}')
     print(scene.get_obj_pos(obj_name = object_name))
 
+
     print('----------------------------')
-    print('Select grasping algorithm:\n1. DEXNET \n2. GRASPNET \n3. GPD')
+    print('Select grasping algorithm:\n1. DEXNET \n2. GRASPNET \n3. GPD \n4. contactgraspnet \n5. Grconvnet')
     algorithm_number = input()
     if int(algorithm_number) == 1:
         print('Calling Dexnet...')
@@ -85,9 +118,15 @@ def main():
     elif int(algorithm_number) == 2:
         print('Calling Graspnet...')
         algorithm_name = "/graspnet_bench/graspnet_grasp_planner_service"
-    else: 
+    elif int(algorithm_number) == 3: 
         print('Calling GPD...')
         algorithm_name = "/gpd_bench/gpd_grasp_planner/gpd_grasp_planner_service"
+    elif int(algorithm_number) == 4: 
+        print('Calling Contactgraspnet...')
+        algorithm_name = "/contact_bench/contact_grasp_planner_service"#/contact_grasp_planner_node
+    else:
+        print('Calling Grconvnet...')
+        algorithm_name = "/grconvnet_bench/grconvnet_grasp_planner_service"#/grconvnet_grasp_planner_node
 
     # Calling the grasp planner
     result_from_service = call_grasp_planner(cam=agent.inhand_cam, 
@@ -123,7 +162,7 @@ def main():
     if to_real == 'y':
         grasp_pose.position.x = grasp_pos[0] 
         grasp_pose.position.y = grasp_pos[1] 
-        grasp_pose.position.z = grasp_pos[2]+(0.017-0.005)  # Compensation due to table level
+        grasp_pose.position.z = grasp_pos[2]#+(0.017-0.005)  # Compensation due to table level
         grasp_pose.orientation.w = grasp_quat[0]
         grasp_pose.orientation.x = grasp_quat[1]
         grasp_pose.orientation.y = grasp_quat[2]
