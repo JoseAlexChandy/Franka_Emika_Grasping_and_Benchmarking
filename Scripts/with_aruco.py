@@ -66,7 +66,7 @@ def main():
     robot = sim_factory.create_robot(s, robot_name="bob")
     s.start()
     robot.use_inv_dyn = False
-    wait_time = 0.5
+    wait_time = 1
 
     # Go to home position
     home_pos = [0.35, 0.0, 0.60]
@@ -118,7 +118,7 @@ def main():
         print('qWB: ', qWB)
         brick_pose.position.x = rBW_W[0] 
         brick_pose.position.y = rBW_W[1] 
-        brick_pose.position.z = rBW_W[2]
+        brick_pose.position.z = rBW_W[2]#+0.00511912+0.02
         brick_pose.orientation.w = qWB[0]
         brick_pose.orientation.x = qWB[1]
         brick_pose.orientation.y = qWB[2]
@@ -153,7 +153,7 @@ def main():
     print(quat2mat(robot.current_c_quat))
     print('\n')
     robot.wait(wait_time)
-    robot.close_fingers(duration=2)
+    robot.close_fingers(duration=3)
     print('-------- FINGERS CLOSED')
     robot.wait(wait_time)
     robot.gotoCartPositionAndQuat(home_pos, home_or)
