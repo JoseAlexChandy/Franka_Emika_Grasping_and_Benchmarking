@@ -8,7 +8,6 @@
 
 # GRASP SERVICE in vincent-gpu:
 
-#   ssh -Y 10.0.2.11
 #   ssh -Y 172.22.3.8
 
 
@@ -17,19 +16,14 @@
 #   bash run.sh heap dexnet_container heap/benchmark_dexnet 
 #   bash run.sh heap 6dgraspnet_container heap/benchmark_6dgraspnet
 #   bash run.sh heap gpd_container heap/benchmark_gpd 
-#   bash run.sh heap grconvnet_container heap/benchmark_grconvnet
 #   bash run.sh heap contactgraspnet_container heap/benchmark_contactgraspnet
-
+#   bash run.sh heap grconvnet_container heap/benchmark_grconvnet 
 
 #   or:  bash run.sh heap dexnet_container
 
 #   source /workspace/catkin_ws/devel/setup.bash
 
-#   export ROS_MASTER_URI=http://10.0.2.3:11311
 #   export ROS_MASTER_URI=http://172.22.3.6:11311
-
-
-#   export ROS_IP=10.0.2.11
 #   export ROS_IP=172.22.3.8
 
 
