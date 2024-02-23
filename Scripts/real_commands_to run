@@ -1,0 +1,34 @@
+
+# CAMERA AND SL ON BOB:
+#   roslaunch realsense2_camera rs_rgbd.launch enable_pointcloud:=true tf_prefix:=measured/camera
+#   cd ~/sl/build/sl_panda
+#   ./xrpanda
+#
+# SEGMENTATION ON SERVER:
+#   ssh -Y 172.22.3.8
+#   cd segmentation
+#   docker compose run node
+#   cd src/unseen_object_clustering
+#   ./experiments/scripts/ros_seg_rgbd_add_test_segmentation_realsense.sh 0
+# 
+# VISUALIZE SEGMENTATION ON BOB
+#   rosrun image_view image_view image:=/seg_image
+#
+# GRASP SERVICE ON SERVER:
+#   ssh -Y 172.22.3.8
+#   cd grasping-benchmarks-panda/docker
+#   bash run.sh heap dexnet_container heap/benchmark_dexnet 
+#   bash run.sh heap 6dgraspnet_container heap/benchmark_6dgraspnet
+#   bash run.sh heap gpd_container heap/benchmark_gpd 
+#   bash run.sh heap contactgraspnet_container heap/benchmark_contactgraspnet
+#   bash run.sh heap grconvnet_container heap/benchmark_grconvnet
+#   source /workspace/catkin_ws/devel/setup.bash
+#   export ROS_MASTER_URI=http://172.22.3.6:11311
+#   export ROS_IP=172.22.3.8
+#   roslaunch grasping_benchmarks_ros grasp_planning_benchmark.launch
+#
+# SCRIPT ON BOB:
+#   conda activate grasp_benchmark
+#   source ~/catkin_ws/devel/setup.bash
+#   python ~/GraspBenchmarkWorkspace/Benchmark/grasp_benchmark/simplified_docker_real.py dexnet
+
